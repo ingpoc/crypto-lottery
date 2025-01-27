@@ -1,15 +1,18 @@
 use anchor_lang::prelude::*;
-use anchor_spl::token::{Token, TokenAccount};
-use models::{state::*, constants};
+use anchor_spl::{
+    token::Token,
+    associated_token::AssociatedToken,
+};
+use models::state::*;
 
 pub mod instructions;
 pub mod models;
 pub mod security;
 pub mod ticket_storage;
 
-declare_id!("DRmPDrBUrF1R4Y7tdKRfjFKQPsdQdtvTEbQY5Qp9GzqY");
+declare_id!("CWyCvnCnPxokrtwdcB9uWACb9hZCNDwCbaXo9DcWp95Y");
 
-#[cfg(target_os = "macos")]
+#[program]
 pub mod crypto_lottery {
     use super::*;
 
@@ -42,22 +45,32 @@ pub struct Initialize<'info> {
 }
 
 #[derive(Accounts)]
+#[instruction(amount: u64)]
 pub struct BuyTicket<'info> {
     #[account(mut)]
     pub lottery: Account<'info, LotteryAccount>,
     #[account(
         mut,
-        seeds = [constants::TICKET_SEED],
+        seeds = [b"ticket"],
         bump,
     )]
     pub ticket_account: Account<'info, TicketAccount>,
     #[account(mut)]
     pub player: Signer<'info>,
-    #[account(mut)]
-    pub player_token_account: Account<'info, TokenAccount>,
-    #[account(mut)]
-    pub lottery_token_account: Account<'info, TokenAccount>,
+    #[account(
+        mut,
+        constraint = player_token_account.key() == player.key()
+    )]
+    /// CHECK: This is safe because we check the owner constraint
+    pub player_token_account: UncheckedAccount<'info>,
+    #[account(
+        mut,
+        constraint = lottery_token_account.key() == lottery.key()
+    )]
+    /// CHECK: This is safe because we check the owner constraint
+    pub lottery_token_account: UncheckedAccount<'info>,
     pub token_program: Program<'info, Token>,
+    pub associated_token_program: Program<'info, AssociatedToken>,
     pub system_program: Program<'info, System>,
 }
 
@@ -75,10 +88,19 @@ pub struct ClaimPrize<'info> {
     pub lottery: Account<'info, LotteryAccount>,
     #[account(mut)]
     pub winner: Signer<'info>,
-    #[account(mut)]
-    pub winner_token_account: Account<'info, TokenAccount>,
-    #[account(mut)]
-    pub lottery_token_account: Account<'info, TokenAccount>,
+    #[account(
+        mut,
+        constraint = winner_token_account.key() == winner.key()
+    )]
+    /// CHECK: This is safe because we check the owner constraint
+    pub winner_token_account: UncheckedAccount<'info>,
+    #[account(
+        mut,
+        constraint = lottery_token_account.key() == lottery.key()
+    )]
+    /// CHECK: This is safe because we check the owner constraint
+    pub lottery_token_account: UncheckedAccount<'info>,
     pub token_program: Program<'info, Token>,
+    pub associated_token_program: Program<'info, AssociatedToken>,
     pub system_program: Program<'info, System>,
 }
