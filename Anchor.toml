@@ -1,11 +1,13 @@
 [toolchain]
+anchor_version = "0.30.1"
+solana_version = "2.0.24"
 
 [features]
 resolution = true
 skip-lint = false
 
 [programs.localnet]
-crypto_lottery = "CWyCvnCnPxokrtwdcB9uWACb9hZCNDwCbaXo9DcWp95Y"
+crypto_lottery = "F5q6vpnQdKCJqKZF19bQibPhvLbMMWMso1RCtwLH3NEJ"
 
 [registry]
 url = "https://api.apr.dev"

@@ -10,7 +10,7 @@ pub mod models;
 pub mod security;
 pub mod ticket_storage;
 
-declare_id!("CWyCvnCnPxokrtwdcB9uWACb9hZCNDwCbaXo9DcWp95Y");
+declare_id!("F5q6vpnQdKCJqKZF19bQibPhvLbMMWMso1RCtwLH3NEJ");
 
 #[program]
 pub mod crypto_lottery {
